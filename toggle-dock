@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -eu
+
+if [ "$(defaults read com.apple.dock orientation)" == "bottom" ]; then
+    defaults write com.apple.dock orientation left && killall Dock
+else
+    defaults write com.apple.dock orientation bottom && killall Dock
+fi
+
