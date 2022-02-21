@@ -7,10 +7,12 @@ usage() {
   echo "Usage: $cmd URL"
 }
 
+set +u
 if [[ -z "$GIT_ROOT" ]]; then
   echo "ERROR: Environment variable GIT_ROOT not set"
   exit 0
 fi
+set -u
 
 if [[ ! -d "$GIT_ROOT" ]]; then
   echo "ERROR: GIT_ROOT directory does not exist: $GIT_ROOT"
@@ -23,8 +25,8 @@ if [[ $# -ne 1 ]]; then
 fi
 URL=$1
 
-URL_GIT_REGEX='^git@(www\.)?([^:]+):([^/]+)/([^/]+)(\.git)?$'
-URL_HTTP_REGEX='^https?://(www\.)?([^/]+)/([^/]+)/([^/]+)(\.git)?/?$'
+URL_GIT_REGEX='^git@(www\.)?([^:]+):([^/]+)/([^.]+)(\.git)?$'
+URL_HTTP_REGEX='^https?://(www\.)?([^/]+)/([^/]+)/([^.]+)(\.git)?/?$'
 
 if [[ "$URL" =~ $URL_GIT_REGEX ]]; then
   HOST=${BASH_REMATCH[2]}
