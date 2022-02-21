@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+set -eu
+
+usage() {
+  cmd=$(basename "$0")
+  echo "Usage: $cmd URL"
+}
+
+if [[ -z "$GIT_ROOT" ]]; then
+  echo "ERROR: Environment variable GIT_ROOT not set"
+  exit 0
+fi
+
+if [[ ! -d "$GIT_ROOT" ]]; then
+  echo "ERROR: GIT_ROOT directory does not exist: $GIT_ROOT"
+  exit 0
+fi
+
+if [[ $# -ne 1 ]]; then
+  usage
+  exit 0
+fi
+URL=$1
+
+URL_GIT_REGEX='^git@(www\.)?([^:]+):([^/]+)/([^/]+)(\.git)?$'
+URL_HTTP_REGEX='^https?://(www\.)?([^/]+)/([^/]+)/([^/]+)(\.git)?/?$'
+
+if [[ "$URL" =~ $URL_GIT_REGEX ]]; then
+  HOST=${BASH_REMATCH[2]}
+  OWNER=${BASH_REMATCH[3]}
+  REPO=${BASH_REMATCH[4]}
+elif [[ "$URL" =~ $URL_HTTP_REGEX ]]; then
+  HOST=${BASH_REMATCH[2]}
+  OWNER=${BASH_REMATCH[3]}
+  REPO=${BASH_REMATCH[4]}
+else
+  echo "ERROR: Incorrect URL format: $URL"
+  exit 1
+fi
+
+if [[ ! -d "$GIT_ROOT/$HOST" ]]; then
+  echo "HOST directory does not exist"
+  echo "Creating HOST directory: $GIT_ROOT/$HOST"
+  mkdir "$GIT_ROOT/$HOST"
+fi
+
+if [[ ! -d "$GIT_ROOT/$HOST/$OWNER" ]]; then
+  echo "OWNER directory does not exist"
+  echo "Creating OWNER directory: $GIT_ROOT/$HOST/$OWNER"
+  mkdir "$GIT_ROOT/$HOST/$OWNER"
+fi
+
+echo "Cloning repo $URL to directory $GIT_ROOT/$HOST/$OWNER/$REPO"
+
+git clone "$URL" "$GIT_ROOT/$HOST/$OWNER/$REPO"
+
